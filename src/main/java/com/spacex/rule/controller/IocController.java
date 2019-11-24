@@ -111,7 +111,10 @@ public class IocController {
     }
 
     @RequestMapping(value = "/search/time/{start}/{end}/{page}/{rows}", method = RequestMethod.GET)
-    public JsonResult searchByTime(@PathVariable("start") Long start, @PathVariable("end") Long end, @PathVariable("page") int page, @PathVariable("rows") int rows) {
+    public JsonResult searchByTime(@PathVariable("start") Long start,
+                                   @PathVariable("end") Long end,
+                                   @PathVariable("page") int page,
+                                   @PathVariable("rows") int rows) {
         if (page < 1 || rows < 1) {
             return JsonResult.fail(ErrorCodeEnum.PARAM_ERROR);
         }
@@ -150,12 +153,13 @@ public class IocController {
         if (JsonUtils.isValidJson(data)) {
             //TODO 合法Json串
             IocBean source = IocBean.parseJson(data);
+            String time = StringUtil.getCurrentDate();
             if (source != null) {
                 if (id != null) {
                     source.setId(id);
-                    source.setUpdate_time(StringUtil.getCurrentDate());
+                    source.setUpdate_time(time);
+                    source.setCreate_time(source.getCreate_time());
                 } else {
-                    String time = StringUtil.getCurrentDate();
                     source.setCreate_time(time);
                     source.setUpdate_time(time);
                 }
