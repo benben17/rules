@@ -26,7 +26,6 @@ public class FileUtils {
             e.printStackTrace();
         }
         try {
-
             return new String(fileContent, "utf-8");
         } catch (UnsupportedEncodingException e) {
             log.error("The OS does not support " + "utf-8");

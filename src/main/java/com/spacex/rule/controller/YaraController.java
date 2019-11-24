@@ -131,10 +131,11 @@ public class YaraController {
             File tmpFile = new File(tmpFileName);
             file.transferTo(tmpFile);
             String fileContent = FileUtils.fileToString(tmpFileName);
-//            YaraBean yara = YaraBean.parseJson(fileContent);
-//
+            if (fileContent.isEmpty()){
+                return JsonResult.fail(ErrorCodeEnum.UPLOAD_FILE_EMPTY);
+            }
+            tmpFile.delete();
             return saveData(null,fileContent);
-//              JsonResult.success(fileContent);
 
         } catch (IOException ex) {
             log.error("upload file failed!", ex);
