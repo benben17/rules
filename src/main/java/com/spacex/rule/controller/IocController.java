@@ -58,6 +58,7 @@ public class IocController {
         }
         Pageable pageable = PageRequest.of(page - 1, rows);
         QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("ioc_list", ioc + "*");
+        System.out.println(queryBuilder);
         Iterable<IocBean> listIt = iocRepository.search(queryBuilder, pageable);
         List<IocBean> list = Lists.newArrayList(listIt);
 

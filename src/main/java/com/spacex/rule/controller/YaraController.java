@@ -5,11 +5,8 @@ import com.spacex.rule.common.ErrorCodeEnum;
 import com.spacex.rule.repository.YaraRepository;
 import com.spacex.rule.bean.YaraBean;
 import com.spacex.rule.util.*;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,14 +43,29 @@ public class YaraController {
         return saveData(id, dataStr);
     }
 
-    @RequestMapping(value = "/search/big_type/{big_type}", method = RequestMethod.GET)
-    public JsonResult searchID(@PathVariable("big_type") String big_type) {
+    @RequestMapping(value = "/search/yara/{big_type}/{page}/{rows}", method = RequestMethod.GET)
+    public JsonResult searchID(@PathVariable("big_type") String big_type,
+                               @PathVariable("page") int page,
+                               @PathVariable("rows") int rows) {
+
+
+        if (page < 1 || rows < 1) {
+            return JsonResult.fail(ErrorCodeEnum.PARAM_ERROR);
+        }
+        Pageable pageable = PageRequest.of(page - 1, rows);
         QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("big_type", big_type + "*");
 
-        Iterable<YaraBean> listIt = yaraRepository.search(queryBuilder);
+//        System.out.println(queryBuilder);
+        Iterable<YaraBean> listIt = yaraRepository.search(queryBuilder, pageable);
+
         List<YaraBean> list = Lists.newArrayList(listIt);
 
-        return JsonResult.success(JsonUtils.list2Json(list.size(), list));
+        //TODO 获取数据总数
+        Iterable<YaraBean> listAllIt = yaraRepository.search(queryBuilder);
+        List<YaraBean> listAll = Lists.newArrayList(listAllIt);
+
+        return JsonResult.success(JsonUtils.list2Json(listAll.size(), rows, list));
+
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.DELETE)
@@ -96,12 +108,12 @@ public class YaraController {
         return JsonResult.success(JsonUtils.list2Json(listAll.size(), rows, list));
     }
 
-    @RequestMapping(value = "/search/time/{start}/{end}/{page}/{rows}/{big_type}", method = RequestMethod.GET)
+    @RequestMapping(value = "/search/time/{start}/{end}/{page}/{rows}", method = RequestMethod.GET)
     public JsonResult searchByTime(@PathVariable("start") Long start,
                                    @PathVariable("end") Long end,
                                    @PathVariable("page") int page,
-                                   @PathVariable("rows") int rows,
-                                   @PathVariable("big_type") String big_type) {
+                                   @PathVariable("rows") int rows
+    ) {
         if (page < 1 || rows < 1) {
             return JsonResult.fail(ErrorCodeEnum.PARAM_ERROR);
         }
@@ -131,16 +143,15 @@ public class YaraController {
     public JsonResult upload(@RequestParam MultipartFile file) {
         String tmpFileName = "/tmp/" + file.getOriginalFilename();
 
-
         try {
             File tmpFile = new File(tmpFileName);
             file.transferTo(tmpFile);
             String fileContent = FileUtils.fileToString(tmpFileName);
-            if (fileContent.isEmpty()){
+            if (fileContent.isEmpty()) {
                 return JsonResult.fail(ErrorCodeEnum.UPLOAD_FILE_EMPTY);
             }
             tmpFile.delete();
-            return saveData(null,fileContent);
+            return saveData(null, fileContent);
 
         } catch (IOException ex) {
             log.error("upload file failed!", ex);
@@ -169,7 +180,7 @@ public class YaraController {
 
                 }
                 // author为空时，默认值为cntic
-                if(yara.getAuthor() == null || yara.getAuthor().isEmpty() || yara.getAuthor() == ""){
+                if (yara.getAuthor() == null || yara.getAuthor().isEmpty() || yara.getAuthor() == "") {
                     yara.setAuthor("cntic");
                 }
 
@@ -197,6 +208,14 @@ public class YaraController {
             return null;
         } else {
             return md5;
+        }
+    }
+
+    private boolean checkParam(int page, int rows) {
+        if (page < 1 || rows < 1) {
+            return false;
+        } else {
+            return true;
         }
     }
 }
