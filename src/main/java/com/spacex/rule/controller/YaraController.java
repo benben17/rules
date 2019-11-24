@@ -4,27 +4,29 @@ import com.google.common.collect.Lists;
 import com.spacex.rule.common.ErrorCodeEnum;
 import com.spacex.rule.repository.YaraRepository;
 import com.spacex.rule.bean.YaraBean;
-import com.spacex.rule.util.DataType;
-import com.spacex.rule.util.JsonResult;
-import com.spacex.rule.util.JsonUtils;
-import com.spacex.rule.util.StringUtil;
+import com.spacex.rule.util.*;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/" + DataType.TYPE_YARA)
 public class YaraController {
+    private Logger log = LoggerFactory.getLogger(YaraController.class);
 
     @Autowired
     private YaraRepository yaraRepository;
@@ -119,13 +121,25 @@ public class YaraController {
         return JsonResult.success(JsonUtils.list2Json(listAll.size(), rows, list));
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public JsonResult searchAll() {
-        Iterable<YaraBean> userES = yaraRepository.findAll();
-        List<YaraBean> allList = new ArrayList<>();
-        userES.forEach(allList::add);
-        return JsonResult.success(JsonUtils.list2Json(allList.size(), allList));
+
+    @RequestMapping(value = "/api/file/upload", method = RequestMethod.POST)
+    public JsonResult upload(@RequestParam MultipartFile file) {
+        String tmpFileName = "/tmp/" + file.getOriginalFilename();
+
+
+        try {
+            File tmpFile = new File(tmpFileName);
+            file.transferTo(tmpFile);
+            String fileContent = FileUtils.fileToString(tmpFileName);
+
+            return  JsonResult.success(fileContent);
+
+        } catch (IOException ex) {
+            log.error("upload file failed!", ex);
+            return JsonResult.fail(ErrorCodeEnum.SYSTEM_ERROR);
+        }
     }
+
 
     private JsonResult saveData(@Nullable String id, String data) {
         //TODO 验证json串数据是否合法
@@ -156,6 +170,7 @@ public class YaraController {
             return JsonResult.fail(ErrorCodeEnum.JSON_ERROR);
         }
     }
+
 
     private String checkMD5(String filename, String rules) {
         String md5 = DigestUtils.md5DigestAsHex((filename + rules).getBytes());

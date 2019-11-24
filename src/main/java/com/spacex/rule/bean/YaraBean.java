@@ -39,6 +39,8 @@ public class YaraBean implements Serializable {
     private String create_time;
     @JsonProperty("rules")
     private String rules;
+    @JsonProperty("author")
+    private String author;
 
 
     public static YaraBean parseJson(String json) {
