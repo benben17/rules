@@ -122,7 +122,7 @@ public class YaraController {
     }
 
 
-    @RequestMapping(value = "/api/file/upload", method = RequestMethod.POST)
+    @RequestMapping(value = "/file/upload", method = RequestMethod.POST)
     public JsonResult upload(@RequestParam MultipartFile file) {
         String tmpFileName = "/tmp/" + file.getOriginalFilename();
 
@@ -131,8 +131,10 @@ public class YaraController {
             File tmpFile = new File(tmpFileName);
             file.transferTo(tmpFile);
             String fileContent = FileUtils.fileToString(tmpFileName);
-
-            return  JsonResult.success(fileContent);
+//            YaraBean yara = YaraBean.parseJson(fileContent);
+//
+            return saveData(null,fileContent);
+//              JsonResult.success(fileContent);
 
         } catch (IOException ex) {
             log.error("upload file failed!", ex);
@@ -151,12 +153,18 @@ public class YaraController {
                 //TODO 验证md5值是否已存在，若已存在，返回添加失败；若不存在，正常添加
                 String md5 = checkMD5(yara.getBig_type(), yara.getRules());
                 if (md5 == null) {
+                    System.out.println(data);
                     return JsonResult.fail(ErrorCodeEnum.DATA_ERROR);
                 }
 
                 if (id != null) {
                     yara.setId(id);
                     yara.setCreate_time(StringUtil.getCurrentDate());
+
+                }
+                // author为空时，默认值为cntic
+                if(yara.getAuthor() == null || yara.getAuthor().isEmpty() || yara.getAuthor() == ""){
+                    yara.setAuthor("cntic");
                 }
 
                 yara.setMd5(md5);
@@ -167,14 +175,14 @@ public class YaraController {
             }
         } else {
             //TODO 非法Json串
+            log.error(data);
             return JsonResult.fail(ErrorCodeEnum.JSON_ERROR);
         }
     }
 
 
-    private String checkMD5(String filename, String rules) {
-        String md5 = DigestUtils.md5DigestAsHex((filename + rules).getBytes());
-
+    private String checkMD5(String big_type, String rules) {
+        String md5 = DigestUtils.md5DigestAsHex((big_type + rules).getBytes());
         QueryBuilder queryBuilder = QueryBuilders.termQuery("md5", md5);
         Iterable<YaraBean> listIt = yaraRepository.search(queryBuilder);
         List<YaraBean> allList = new ArrayList<>();
