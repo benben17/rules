@@ -32,7 +32,7 @@ public class YaraBean implements Serializable {
     private String id = UUID.randomUUID().toString();
 
     @JsonProperty("big_type")
-    private String file_name;
+    private String big_type;
     @JsonProperty("md5")
     private String md5;
     @JsonProperty("create_time")

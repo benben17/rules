@@ -43,7 +43,7 @@ public class YaraController {
 
     @RequestMapping(value = "/search/big_type/{big_type}", method = RequestMethod.GET)
     public JsonResult searchID(@PathVariable("big_type") String big_type) {
-        QueryBuilder queryBuilder = QueryBuilders.matchQuery("big_type", big_type);
+        QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("big_type", big_type + "*");
         Iterable<YaraBean> listIt = yaraRepository.search(queryBuilder);
         List<YaraBean> list = Lists.newArrayList(listIt);
 
@@ -135,7 +135,7 @@ public class YaraController {
             if (yara != null) {
 
                 //TODO 验证md5值是否已存在，若已存在，返回添加失败；若不存在，正常添加
-                String md5 = checkMD5(yara.getFile_name(), yara.getRules());
+                String md5 = checkMD5(yara.getBig_type(), yara.getRules());
                 if (md5 == null) {
                     return JsonResult.fail(ErrorCodeEnum.DATA_ERROR);
                 }
@@ -160,7 +160,7 @@ public class YaraController {
     private String checkMD5(String filename, String rules) {
         String md5 = DigestUtils.md5DigestAsHex((filename + rules).getBytes());
 
-        QueryBuilder queryBuilder = QueryBuilders.matchQuery("md5", md5);
+        QueryBuilder queryBuilder = QueryBuilders.termQuery("md5", md5);
         Iterable<YaraBean> listIt = yaraRepository.search(queryBuilder);
         List<YaraBean> allList = new ArrayList<>();
         listIt.forEach(allList::add);
