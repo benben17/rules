@@ -5,8 +5,11 @@ import com.spacex.rule.common.ErrorCodeEnum;
 import com.spacex.rule.repository.YaraRepository;
 import com.spacex.rule.bean.YaraBean;
 import com.spacex.rule.util.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +49,7 @@ public class YaraController {
     @RequestMapping(value = "/search/big_type/{big_type}", method = RequestMethod.GET)
     public JsonResult searchID(@PathVariable("big_type") String big_type) {
         QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("big_type", big_type + "*");
+
         Iterable<YaraBean> listIt = yaraRepository.search(queryBuilder);
         List<YaraBean> list = Lists.newArrayList(listIt);
 
@@ -92,11 +96,12 @@ public class YaraController {
         return JsonResult.success(JsonUtils.list2Json(listAll.size(), rows, list));
     }
 
-    @RequestMapping(value = "/search/time/{start}/{end}/{page}/{rows}", method = RequestMethod.GET)
+    @RequestMapping(value = "/search/time/{start}/{end}/{page}/{rows}/{big_type}", method = RequestMethod.GET)
     public JsonResult searchByTime(@PathVariable("start") Long start,
                                    @PathVariable("end") Long end,
                                    @PathVariable("page") int page,
-                                   @PathVariable("rows") int rows) {
+                                   @PathVariable("rows") int rows,
+                                   @PathVariable("big_type") String big_type) {
         if (page < 1 || rows < 1) {
             return JsonResult.fail(ErrorCodeEnum.PARAM_ERROR);
         }
