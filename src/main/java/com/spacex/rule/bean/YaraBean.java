@@ -34,10 +34,9 @@ public class YaraBean implements Serializable {
     private String id = UUID.randomUUID().toString();
 
     @JsonProperty("big_type")
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Text,fielddata = true)
     private String big_type;
     @JsonProperty("md5")
-    @Field(type = FieldType.Keyword)
     private String md5;
     @JsonProperty("create_time")
     private String create_time;
