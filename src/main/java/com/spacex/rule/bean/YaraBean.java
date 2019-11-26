@@ -11,6 +11,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
+import org.springframework.data.elasticsearch.annotations.Field;
+import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -32,8 +34,10 @@ public class YaraBean implements Serializable {
     private String id = UUID.randomUUID().toString();
 
     @JsonProperty("big_type")
+    @Field(type = FieldType.Keyword)
     private String big_type;
     @JsonProperty("md5")
+    @Field(type = FieldType.Keyword)
     private String md5;
     @JsonProperty("create_time")
     private String create_time;

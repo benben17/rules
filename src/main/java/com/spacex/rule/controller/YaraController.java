@@ -1,18 +1,24 @@
 package com.spacex.rule.controller;
 
 import com.google.common.collect.Lists;
-import com.spacex.rule.bean.IocBean;
 import com.spacex.rule.common.ErrorCodeEnum;
 import com.spacex.rule.repository.YaraRepository;
 import com.spacex.rule.bean.YaraBean;
 import com.spacex.rule.util.*;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/" + DataType.TYPE_YARA)
@@ -31,6 +38,8 @@ public class YaraController {
 
     @Autowired
     private YaraRepository yaraRepository;
+    @Autowired
+    private ElasticsearchTemplate elasticsearchTemplate;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public JsonResult create(@RequestBody Object data) {
@@ -220,6 +229,28 @@ public class YaraController {
         } else {
             return md5;
         }
+    }
+
+    @RequestMapping(value = "/search/agg", method = RequestMethod.GET)
+    public JsonResult aggregationSearch() {
+        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+        nativeSearchQueryBuilder.addAggregation(AggregationBuilders.terms("aggSearch").field("big_type").showTermDocCountError(true));
+        NativeSearchQuery nativeSearchQuery = nativeSearchQueryBuilder.build();
+
+        AggregatedPage<YaraBean> result = elasticsearchTemplate.queryForPage(nativeSearchQuery, YaraBean.class);
+
+        Aggregations aggregations = result.getAggregations();
+        StringTerms terms = aggregations.get("aggSearch");
+        terms.getDocCountError();
+        List<StringTerms.Bucket> buckets = terms.getBuckets();
+        List<Map<String,String>> resultList = new ArrayList<>();
+        for (StringTerms.Bucket bucket:buckets) {
+            Map<String,String> map = new HashMap<>();
+            map.put("key",bucket.getKey().toString());
+            map.put("doc_count",bucket.getDocCount()+"");
+            resultList.add(map);
+        }
+        return JsonResult.success(JsonUtils.list2Json(resultList.size(),resultList));
     }
 
 }
