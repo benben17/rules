@@ -63,8 +63,8 @@ public class YaraController {
             return JsonResult.fail(ErrorCodeEnum.PARAM_ERROR);
         }
         Pageable pageable = PageRequest.of(page - 1, rows);
-        big_type = big_type.toLowerCase();
-        QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("big_type", big_type + "*");
+//        big_type = big_type.toLowerCase();
+        QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("big_type", big_type+"*");
 
 //        System.out.println(queryBuilder);
         Iterable<YaraBean> listIt = yaraRepository.search(queryBuilder, pageable);
@@ -246,7 +246,7 @@ public class YaraController {
         List<Map<String,String>> resultList = new ArrayList<>();
         for (StringTerms.Bucket bucket:buckets) {
             Map<String,String> map = new HashMap<>();
-            map.put("key",bucket.getKey().toString());
+            map.put("key",bucket.getKeyAsString());
             map.put("doc_count",bucket.getDocCount()+"");
             resultList.add(map);
         }
