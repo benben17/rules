@@ -1,10 +1,19 @@
 package com.spacex.rule.controller;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.Lists;
+import com.spacex.rule.bean.RequestJson;
+import com.spacex.rule.bean.ResponseJson;
 import com.spacex.rule.common.ErrorCodeEnum;
+import com.spacex.rule.config.Url;
 import com.spacex.rule.repository.YaraRepository;
 import com.spacex.rule.bean.YaraBean;
 import com.spacex.rule.util.*;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.HttpClient;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -186,6 +195,20 @@ public class YaraController {
             //TODO 合法Json串
             YaraBean yara = YaraBean.parseJson(data);
             if (yara != null) {
+
+                //TODO 调用第三方接口，验证数据，返回200，继续操作，返回400或其他，直接返回结果，不再进行后续操作
+                RequestJson requestJson = new RequestJson(yara.getBig_type(),yara.getRules());
+                String responseStr = HttpUtil.httpPostWithJson(Url.YARA_VALIDATE_URL,requestJson.toString());
+                if (responseStr == null || JsonUtils.isValidJson(responseStr)) {
+                    //TODO 请求失败
+                    return JsonResult.fail(ErrorCodeEnum.JSON_ERROR);
+                } else {
+                    //TODO 请求成功，获取返回码
+                    ResponseJson responseJson = JsonUtils.json2Object(responseStr, ResponseJson.class);
+                    if (responseJson.getCode() != 200) {
+                        return JsonResult.fail(responseJson.getCode(),responseJson.getMsg());
+                    }
+                }
 
                 //TODO 验证md5值是否已存在，若已存在，返回添加失败；若不存在，正常添加
                 String md5 = checkMD5(yara.getBig_type(), yara.getRules());

@@ -10,11 +10,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResponseJson {
-    @JsonProperty("code")
-    private int code;
-    @JsonProperty("msg")
-    private String msg;
-    @JsonProperty("tag")
-    private String tag;
+public class RequestJson {
+    @JsonProperty("big_type")
+    private String big_type;
+    @JsonProperty("rules")
+    private String rules;
 }

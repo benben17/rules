@@ -7,14 +7,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.spacex.rule.bean.ResponseJson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.*;
 
