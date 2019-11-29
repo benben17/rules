@@ -6,6 +6,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
 import java.nio.charset.Charset;
 
@@ -16,6 +17,9 @@ public class HttpUtil {
         HttpPost post = null;
         try {
             HttpClient httpClient = HttpClientBuilder.create().build();
+
+            httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 20000);
+            httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 20000);
             post = new HttpPost(url);
             // 构造消息头
             post.setHeader("Content-type", "application/json; charset=utf-8");
