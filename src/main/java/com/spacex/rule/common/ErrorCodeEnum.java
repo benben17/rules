@@ -21,6 +21,7 @@ public enum ErrorCodeEnum {
     SCAN_ERROR(100010, "扫描失败"),
     JSON_ERROR(1000020,"JSON错误"),
     DATA_ID_ERROR(1000021,"数据不存在"),
+    YARA_VALIDATE_FAIL(1000022, "验证yara数据请求失败"),
     INSERT_FAIL(4001, "插入失败"),
     DELETE_FAIL(4002, "删除失败"),
     DELETE_ERROR(40002, "实体有关系存在存在，或者有子实体"),

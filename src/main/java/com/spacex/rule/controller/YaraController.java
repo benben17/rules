@@ -201,7 +201,7 @@ public class YaraController {
                 String responseStr = HttpUtil.httpPostWithJson(Url.YARA_VALIDATE_URL,requestJson.toString());
                 if (responseStr == null || JsonUtils.isValidJson(responseStr)) {
                     //TODO 请求失败
-                    return JsonResult.fail(ErrorCodeEnum.JSON_ERROR);
+                    return JsonResult.fail(ErrorCodeEnum.YARA_VALIDATE_FAIL);
                 } else {
                     //TODO 请求成功，获取返回码
                     ResponseJson responseJson = JsonUtils.json2Object(responseStr, ResponseJson.class);
