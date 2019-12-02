@@ -27,8 +27,8 @@ import java.util.UUID;
 @Document(indexName = YaraBean.INDEX_NAME,type= YaraBean.TYPE)
 public class YaraBean implements Serializable {
 
-    public static final String INDEX_NAME = "yara";
-    public static final String TYPE="yara";
+    public static final String INDEX_NAME = "cntic_yara_rules";
+    public static final String TYPE="yara_rules";
 
     @Id
     private String id = UUID.randomUUID().toString();

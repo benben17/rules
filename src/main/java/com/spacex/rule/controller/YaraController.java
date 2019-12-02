@@ -198,8 +198,14 @@ public class YaraController {
 
                 //TODO 调用第三方接口，验证数据，返回200，继续操作，返回400或其他，直接返回结果，不再进行后续操作
                 RequestJson requestJson = new RequestJson(yara.getBig_type(),yara.getRules());
-                String responseStr = HttpUtil.httpPostWithJson(Url.YARA_VALIDATE_URL,requestJson.toString());
-                if (responseStr == null || JsonUtils.isValidJson(responseStr)) {
+                Map<String,String> params = new HashMap<>();
+                params.put("big_type",yara.getBig_type());
+                params.put("rules",yara.getRules());
+
+                //String responseStr = HttpUtil.httpPostWithJson(Url.YARA_VALIDATE_URL,requestJson.toString());
+                String responseStr = HttpUtil.httpGet(Url.YARA_VALIDATE_URL,params);
+
+                if (responseStr == null || !JsonUtils.isValidJson(responseStr)) {
                     //TODO 请求失败
                     return JsonResult.fail(ErrorCodeEnum.YARA_VALIDATE_FAIL);
                 } else {
