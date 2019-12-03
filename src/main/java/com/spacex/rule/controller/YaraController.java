@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
@@ -125,8 +126,8 @@ public class YaraController {
         if (page < 1 || rows < 1) {
             return JsonResult.fail(ErrorCodeEnum.PARAM_ERROR);
         }
-        Pageable pageable = PageRequest.of(page - 1, rows);
-        Iterable<YaraBean> userES = yaraRepository.findAll(pageable);
+        PageRequest pageRequest = PageRequest.of(page-1,rows,new Sort(Sort.Direction.DESC, "create_time.keyword"));
+        Iterable<YaraBean> userES = yaraRepository.findAll(pageRequest);
         List<YaraBean> list = new ArrayList<>();
         userES.forEach(list::add);
 
@@ -225,8 +226,8 @@ public class YaraController {
 
                 if (id != null) {
                     yara.setId(id);
+                } else {
                     yara.setCreate_time(StringUtil.getCurrentDate());
-
                 }
                 // author为空时，默认值为cntic
                 if (yara.getAuthor() == null || yara.getAuthor().isEmpty() || yara.getAuthor() == "") {

@@ -13,6 +13,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
@@ -98,8 +99,8 @@ public class IocController {
         if (page < 1 || rows < 1) {
             return JsonResult.fail(ErrorCodeEnum.PARAM_ERROR);
         }
-        Pageable pageable = PageRequest.of(page - 1, rows);
-        Iterable<IocBean> userES = iocRepository.findAll(pageable);
+        PageRequest pageRequest = PageRequest.of(page-1,rows,new Sort(Sort.Direction.DESC, "create_time.keyword"));
+        Iterable<IocBean> userES = iocRepository.findAll(pageRequest);
         List<IocBean> list = new ArrayList<>();
         userES.forEach(list::add);
 
