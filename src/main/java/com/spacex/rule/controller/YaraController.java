@@ -36,10 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/" + DataType.TYPE_YARA)
@@ -122,11 +119,12 @@ public class YaraController {
     }
 
     @RequestMapping(value = "/search/all/{page}/{rows}", method = RequestMethod.GET)
-    public JsonResult searchAllByPage(@PathVariable("page") int page, @PathVariable("rows") int rows) {
+    public JsonResult searchAllByPage(@PathVariable("page") int page,
+                                      @PathVariable("rows") int rows) {
         if (page < 1 || rows < 1) {
             return JsonResult.fail(ErrorCodeEnum.PARAM_ERROR);
         }
-        PageRequest pageRequest = PageRequest.of(page-1,rows,new Sort(Sort.Direction.DESC, "create_time.keyword"));
+        PageRequest pageRequest = PageRequest.of(page-1,rows,new Sort(Sort.Direction.DESC, "create_time"));
         Iterable<YaraBean> userES = yaraRepository.findAll(pageRequest);
         List<YaraBean> list = new ArrayList<>();
         userES.forEach(list::add);
@@ -227,7 +225,8 @@ public class YaraController {
                 if (id != null) {
                     yara.setId(id);
                 } else {
-                    yara.setCreate_time(StringUtil.getCurrentDate());
+//                    yara.setCreate_time(StringUtil.getCurrentDate());
+                    yara.setCreate_time(new Date());
                 }
                 // author为空时，默认值为cntic
                 if (yara.getAuthor() == null || yara.getAuthor().isEmpty() || yara.getAuthor() == "") {
