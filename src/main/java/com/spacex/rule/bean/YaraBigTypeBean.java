@@ -1,11 +1,7 @@
 package com.spacex.rule.bean;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,16 +14,17 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Date;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(indexName = YaraBean.INDEX_NAME, type = YaraBean.TYPE)
-public class YaraBean implements Serializable {
+@Document(indexName = YaraBigTypeBean.INDEX_NAME, type = YaraBigTypeBean.TYPE)
+public class YaraBigTypeBean implements Serializable {
 
-    public static final String INDEX_NAME = "cntic_yara_rules";
-    public static final String TYPE = "yara_rules";
+    public static final String INDEX_NAME = "yara_bigtype";
+    public static final String TYPE = "yara_bigtype_data";
 
     @Id
     private String id = UUID.randomUUID().toString();
@@ -36,23 +33,18 @@ public class YaraBean implements Serializable {
     @Field(type = FieldType.Keyword)
 //    @Field(type = FieldType.Text)
     private String big_type;
-    @JsonProperty("md5")
-    private String md5;
+
     @JsonProperty("create_time")
     @Field(type = FieldType.Date, format = DateFormat.custom,pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern ="yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date create_time;
-    @JsonProperty("rules")
-    private String rules;
-    @JsonProperty("author")
-    private String author;
 
 
-    public static YaraBean parseJson(String json) {
-        YaraBean source = null;
+    public static YaraBigTypeBean parseJson(String json) {
+        YaraBigTypeBean source = null;
         try {
             ObjectMapper mapper = new ObjectMapper();
-            source = mapper.readValue(json, YaraBean.class);
+            source = mapper.readValue(json, YaraBigTypeBean.class);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.spacex</groupId>
     <artifactId>rules-manager</artifactId>
-    <version>0.0.4</version>
+    <version>1.0.0</version>
     <name>ElaSearch</name>
     <packaging>jar</packaging>
     <description>SpringBoot+Elasticsearch</description>

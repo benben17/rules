@@ -7,10 +7,10 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 
 @SpringBootApplication
 @ServletComponentScan
-public class CrudApplication extends SpringBootServletInitializer {
+public class RulesApplication extends SpringBootServletInitializer {
 
     public static void main(String[] args) {
-        SpringApplication.run(CrudApplication.class, args);
+        SpringApplication.run(RulesApplication.class, args);
     }
 
 }

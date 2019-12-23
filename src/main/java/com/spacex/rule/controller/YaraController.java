@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.Lists;
 import com.spacex.rule.bean.RequestJson;
 import com.spacex.rule.bean.ResponseJson;
+import com.spacex.rule.bean.YaraBigTypeBean;
 import com.spacex.rule.common.ErrorCodeEnum;
 import com.spacex.rule.config.Url;
+import com.spacex.rule.repository.YaraBigTypeRepository;
 import com.spacex.rule.repository.YaraRepository;
 import com.spacex.rule.bean.YaraBean;
 import com.spacex.rule.util.*;
@@ -46,6 +48,8 @@ public class YaraController {
     @Autowired
     private YaraRepository yaraRepository;
     @Autowired
+    private YaraBigTypeRepository yaraBigTypeRepository;
+    @Autowired
     private ElasticsearchTemplate elasticsearchTemplate;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -71,7 +75,7 @@ public class YaraController {
         }
         Pageable pageable = PageRequest.of(page - 1, rows);
 //        big_type = big_type.toLowerCase();
-        QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("big_type", big_type+"*");
+        QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("big_type", big_type + "*");
 
 //        System.out.println(queryBuilder);
         Iterable<YaraBean> listIt = yaraRepository.search(queryBuilder, pageable);
@@ -124,7 +128,7 @@ public class YaraController {
         if (page < 1 || rows < 1) {
             return JsonResult.fail(ErrorCodeEnum.PARAM_ERROR);
         }
-        PageRequest pageRequest = PageRequest.of(page-1,rows,new Sort(Sort.Direction.DESC, "create_time"));
+        PageRequest pageRequest = PageRequest.of(page - 1, rows, new Sort(Sort.Direction.DESC, "create_time"));
         Iterable<YaraBean> userES = yaraRepository.findAll(pageRequest);
         List<YaraBean> list = new ArrayList<>();
         userES.forEach(list::add);
@@ -196,13 +200,14 @@ public class YaraController {
             if (yara != null) {
 
                 //TODO 调用第三方接口，验证数据，返回200，继续操作，返回400或其他，直接返回结果，不再进行后续操作
-                RequestJson requestJson = new RequestJson(yara.getBig_type(),yara.getRules());
-                Map<String,String> params = new HashMap<>();
-                params.put("big_type",yara.getBig_type());
-                params.put("rules",yara.getRules());
+                RequestJson requestJson = new RequestJson(yara.getBig_type(), yara.getRules());
+                Map<String, String> params = new HashMap<>();
+                params.put("big_type", yara.getBig_type());
+                params.put("rules", yara.getRules());
 
                 //String responseStr = HttpUtil.httpPostWithJson(Url.YARA_VALIDATE_URL,requestJson.toString());
-                String responseStr = HttpUtil.httpGet(Url.YARA_VALIDATE_URL,params);
+                System.out.println(Url.YARA_VALIDATE_URL);
+                String responseStr = HttpUtil.httpGet(Url.YARA_VALIDATE_URL, params);
 
                 if (responseStr == null || !JsonUtils.isValidJson(responseStr)) {
                     //TODO 请求失败
@@ -211,10 +216,12 @@ public class YaraController {
                     //TODO 请求成功，获取返回码
                     ResponseJson responseJson = JsonUtils.json2Object(responseStr, ResponseJson.class);
                     if (responseJson.getCode() != 200) {
-                        return JsonResult.fail(responseJson.getCode(),responseJson.getMsg());
+                        return JsonResult.fail(responseJson.getCode(), responseJson.getMsg());
                     }
                 }
 
+                //检查big—type
+                checkBigType(yara.getBig_type());
                 //TODO 验证md5值是否已存在，若已存在，返回添加失败；若不存在，正常添加
                 String md5 = checkMD5(yara.getBig_type(), yara.getRules());
                 if (md5 == null) {
@@ -260,6 +267,26 @@ public class YaraController {
         }
     }
 
+    private boolean checkBigType(String bigType) {
+        if (bigType.isEmpty() || bigType == "null") {
+            return false;
+        }
+        QueryBuilder queryBuilder = QueryBuilders.termQuery("big_type", bigType);
+        Iterable<YaraBigTypeBean> listIt = yaraBigTypeRepository.search(queryBuilder);
+        List<YaraBigTypeBean> allList = new ArrayList<>();
+        listIt.forEach(allList::add);
+        System.out.println(allList.size());
+        if (allList.size() > 0) {
+        } else {
+            YaraBigTypeBean yaraBigType = new YaraBigTypeBean();
+            yaraBigType.setBig_type(bigType);
+            yaraBigType.setCreate_time(new Date());
+            yaraBigTypeRepository.save(yaraBigType);
+
+        }
+        return true;
+    }
+
     @RequestMapping(value = "/search/agg", method = RequestMethod.GET)
     public JsonResult aggregationSearch() {
         NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
@@ -272,14 +299,14 @@ public class YaraController {
         StringTerms terms = aggregations.get("aggSearch");
         terms.getDocCountError();
         List<StringTerms.Bucket> buckets = terms.getBuckets();
-        List<Map<String,String>> resultList = new ArrayList<>();
-        for (StringTerms.Bucket bucket:buckets) {
-            Map<String,String> map = new HashMap<>();
-            map.put("key",bucket.getKeyAsString());
-            map.put("doc_count",bucket.getDocCount()+"");
+        List<Map<String, String>> resultList = new ArrayList<>();
+        for (StringTerms.Bucket bucket : buckets) {
+            Map<String, String> map = new HashMap<>();
+            map.put("key", bucket.getKeyAsString());
+            map.put("doc_count", bucket.getDocCount() + "");
             resultList.add(map);
         }
-        return JsonResult.success(JsonUtils.list2Json(resultList.size(),resultList));
+        return JsonResult.success(JsonUtils.list2Json(resultList.size(), resultList));
     }
 
 }
