@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
@@ -28,6 +30,8 @@ public class IocController {
 
     @Autowired
     private IocRepository iocRepository;
+    @Autowired
+    private ElasticsearchTemplate esTemplate;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public JsonResult create(@RequestBody Object data) {
@@ -164,8 +168,16 @@ public class IocController {
                     source.setCreate_time(time);
                     source.setUpdate_time(time);
                 }
-                IocBean bean = iocRepository.save(source);
-                return JsonResult.success(bean.getId());
+                IndexQuery query = new IndexQuery();
+                query.setId(source.getId());
+                query.setSource(data);
+                query.setIndexName(IocBean.INDEX_NAME);
+                query.setType(IocBean.TYPE);
+                esTemplate.index(query);
+
+                return JsonResult.success(query.getId());
+//                IocBean bean = iocRepository.save(source);
+//                return JsonResult.success(bean.getId());
             } else {
                 return JsonResult.fail(ErrorCodeEnum.JSON_ERROR);
             }
