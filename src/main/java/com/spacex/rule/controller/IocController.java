@@ -168,16 +168,15 @@ public class IocController {
                     source.setCreate_time(time);
                     source.setUpdate_time(time);
                 }
+                String dataStr = JsonUtils.object2Json(source);
                 IndexQuery query = new IndexQuery();
                 query.setId(source.getId());
-                query.setSource(data);
+                query.setSource(dataStr);
                 query.setIndexName(IocBean.INDEX_NAME);
                 query.setType(IocBean.TYPE);
                 esTemplate.index(query);
 
                 return JsonResult.success(query.getId());
-//                IocBean bean = iocRepository.save(source);
-//                return JsonResult.success(bean.getId());
             } else {
                 return JsonResult.fail(ErrorCodeEnum.JSON_ERROR);
             }
