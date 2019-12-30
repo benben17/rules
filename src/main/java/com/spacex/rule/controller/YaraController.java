@@ -1,21 +1,15 @@
 package com.spacex.rule.controller;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.Lists;
 import com.spacex.rule.bean.RequestJson;
 import com.spacex.rule.bean.ResponseJson;
 import com.spacex.rule.bean.YaraBigTypeBean;
 import com.spacex.rule.common.ErrorCodeEnum;
-import com.spacex.rule.config.Url;
+import com.spacex.rule.config.Properties;
 import com.spacex.rule.repository.YaraBigTypeRepository;
 import com.spacex.rule.repository.YaraRepository;
 import com.spacex.rule.bean.YaraBean;
 import com.spacex.rule.util.*;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.HttpClient;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -206,8 +200,9 @@ public class YaraController {
                 params.put("rules", yara.getRules());
 
                 //String responseStr = HttpUtil.httpPostWithJson(Url.YARA_VALIDATE_URL,requestJson.toString());
-                System.out.println(Url.YARA_VALIDATE_URL);
-                String responseStr = HttpUtil.httpGet(Url.YARA_VALIDATE_URL, params);
+                String yaraValidateUrl = new Properties().getYaraValidateUrl();
+                System.out.println(yaraValidateUrl);
+                String responseStr = HttpUtil.httpGet(yaraValidateUrl, params);
 
                 if (responseStr == null || !JsonUtils.isValidJson(responseStr)) {
                     //TODO 请求失败
