@@ -174,7 +174,8 @@ public class IocController {
                 query.setSource(dataStr);
                 query.setIndexName(IocBean.INDEX_NAME);
                 query.setType(IocBean.TYPE);
-                esTemplate.index(query);
+
+                esTemplate.refresh(IocBean.INDEX_NAME);
 
                 return JsonResult.success(query.getId());
             } else {
