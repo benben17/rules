@@ -45,6 +45,8 @@ public class YaraController {
     private YaraBigTypeRepository yaraBigTypeRepository;
     @Autowired
     private ElasticsearchTemplate elasticsearchTemplate;
+    @Autowired
+    private Properties properties;
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public JsonResult create(@RequestBody Object data) {
@@ -202,7 +204,7 @@ public class YaraController {
                 params.put("rules", yara.getRules());
 
                 //String responseStr = HttpUtil.httpPostWithJson(Url.YARA_VALIDATE_URL,requestJson.toString());
-                String yaraValidateUrl = new Properties().getYaraValidateUrl();
+                String yaraValidateUrl = properties.getYaraValidateUrl();
                 System.out.println(yaraValidateUrl);
                 String responseStr = HttpUtil.httpGet(yaraValidateUrl, params);
 
@@ -288,7 +290,7 @@ public class YaraController {
     private boolean deleteValidate(String id) {
         Map<String, String> params = new HashMap<>();
         params.put("id", id);
-        String deleteValidateUrl = new Properties().getYaraDeleteValidateUrl();
+        String deleteValidateUrl = properties.getYaraDeleteValidateUrl();
         String responseStr = HttpUtil.httpGet(deleteValidateUrl, params);
 
         if (responseStr != null && JsonUtils.isValidJson(responseStr)) {
