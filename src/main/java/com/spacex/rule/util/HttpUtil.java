@@ -32,7 +32,7 @@ public class HttpUtil {
                 list.add(pair);
             }
             uriBuilder.addParameters(list);
-            httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 20000);
+//            httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 20000);
 //            httpClient.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, 20000);
             get = new HttpGet(uriBuilder.build());
             // 构造消息头
