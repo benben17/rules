@@ -196,6 +196,7 @@ public class YaraController {
         if (JsonUtils.isValidJson(data)) {
             //TODO 合法Json串
             YaraBean yara = YaraBean.parseJson(data);
+
             if (yara != null) {
 
                 //TODO 调用第三方接口，验证数据，返回200，继续操作，返回400或其他，直接返回结果，不再进行后续操作
@@ -203,10 +204,13 @@ public class YaraController {
                 Map<String, String> params = new HashMap<>();
                 params.put("big_type", yara.getBig_type());
                 params.put("rules", yara.getRules());
+                System.out.println(yara.getId());
+                params.put("id", yara.getId());
 
                 //String responseStr = HttpUtil.httpPostWithJson(Url.YARA_VALIDATE_URL,requestJson.toString());
                 String yaraValidateUrl = properties.getYaraValidateUrl();
                 System.out.println(yaraValidateUrl);
+                System.out.println(params);
                 String responseStr = HttpUtil.httpGet(yaraValidateUrl, params);
 
                 //测试
@@ -297,7 +301,8 @@ public class YaraController {
         if (responseStr != null && JsonUtils.isValidJson(responseStr)) {
             //TODO 请求成功，获取返回码
             ResponseJson responseJson = JsonUtils.json2Object(responseStr, ResponseJson.class);
-            if (responseJson.getCode() != 200) {
+            System.out.println(responseJson.getMsg());
+            if (responseJson.getCode() == 200) {
                 return true;
             }
         }
