@@ -103,7 +103,8 @@ public class YaraController {
             return JsonResult.fail(ErrorCodeEnum.PARAM_ERROR);
         } else {
             for (String id : ids) {
-                if (yaraRepository.existsById(id)) {
+                //TODO G11 增加删除验证接口调用
+                if (deleteValidate(id) && yaraRepository.existsById(id)) {
                     yaraRepository.deleteById(id);
                     success_ids += id + ",";
                 } else {
@@ -280,6 +281,22 @@ public class YaraController {
 
         }
         return true;
+    }
+
+    private boolean deleteValidate(String id) {
+        Map<String, String> params = new HashMap<>();
+        params.put("id", id);
+        String deleteValidateUrl = new Properties().getYaraDeleteValidateUrl();
+        String responseStr = HttpUtil.httpGet(deleteValidateUrl, params);
+
+        if (responseStr != null && JsonUtils.isValidJson(responseStr)) {
+            //TODO 请求成功，获取返回码
+            ResponseJson responseJson = JsonUtils.json2Object(responseStr, ResponseJson.class);
+            if (responseJson.getCode() != 200) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @RequestMapping(value = "/search/agg", method = RequestMethod.GET)
