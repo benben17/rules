@@ -13,4 +13,5 @@ public class Properties {
     public String getYaraValidateUrl() {
         return "http://" + yaraUrl + ":" + yaraPort + "/yara/verification";
     }
+
 }

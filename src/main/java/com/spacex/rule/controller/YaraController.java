@@ -104,6 +104,7 @@ public class YaraController {
         } else {
             for (String id : ids) {
                 if (yaraRepository.existsById(id)) {
+
                     yaraRepository.deleteById(id);
                     success_ids += id + ",";
                 } else {
