@@ -106,6 +106,7 @@ public class YaraController {
 
                 //TODO G11 增加删除验证接口调用
                 if (deleteValidate(id) && yaraRepository.existsById(id)) {
+//                if(yaraRepository.existsById(id)) {
                     yaraRepository.deleteById(id);
                     success_ids += id + ",";
                 } else {
