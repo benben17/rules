@@ -108,11 +108,9 @@ public class IocController {
         List<IocBean> list = new ArrayList<>();
         userES.forEach(list::add);
 
-        //TODO 获取数据总数
-        Iterable<IocBean> listAllIt = iocRepository.findAll();
-        List<IocBean> listAll = Lists.newArrayList(listAllIt);
+        long count = iocRepository.count();
 
-        return JsonResult.success(JsonUtils.list2Json(listAll.size(), rows, list));
+        return JsonResult.success(JsonUtils.list2Json(count, rows, list));
     }
 
     @RequestMapping(value = "/search/time/{start}/{end}/{page}/{rows}", method = RequestMethod.GET)
@@ -138,11 +136,9 @@ public class IocController {
         List<IocBean> list = new ArrayList<>();
         listIt.forEach(list::add);
 
-        //TODO 获取数据总数
-        Iterable<IocBean> listAllIt = iocRepository.findAll();
-        List<IocBean> listAll = Lists.newArrayList(listAllIt);
+        long count = iocRepository.count();
 
-        return JsonResult.success(JsonUtils.list2Json(listAll.size(), rows, list));
+        return JsonResult.success(JsonUtils.list2Json(count, rows, list));
     }
 
     @RequestMapping(method = RequestMethod.GET)
