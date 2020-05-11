@@ -175,7 +175,7 @@ public class JsonUtils {
         return list2Json(rows,rows,list);
     }
 
-    public static <T> String list2Json(int allRows,int pageSize,List<T> list) {
+    public static <T> String list2Json(long allRows,int pageSize,List<T> list) {
         ObjectMapper mapper = new ObjectMapper();
         Map<String, Object> map = new HashMap<>();
         map.put("allRows", allRows);

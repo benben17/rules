@@ -78,11 +78,9 @@ public class YaraController {
 
         List<YaraBean> list = Lists.newArrayList(listIt);
 
-        //TODO 获取数据总数
-        Iterable<YaraBean> listAllIt = yaraRepository.search(queryBuilder);
-        List<YaraBean> listAll = Lists.newArrayList(listAllIt);
+        long count = yaraRepository.count();
 
-        return JsonResult.success(JsonUtils.list2Json(listAll.size(), rows, list));
+        return JsonResult.success(JsonUtils.list2Json(count, rows, list));
 
     }
 
@@ -132,11 +130,9 @@ public class YaraController {
         List<YaraBean> list = new ArrayList<>();
         userES.forEach(list::add);
 
-        //TODO 获取数据总数
-        Iterable<YaraBean> listAllIt = yaraRepository.findAll();
-        List<YaraBean> listAll = Lists.newArrayList(listAllIt);
+        long count = yaraRepository.count();
 
-        return JsonResult.success(JsonUtils.list2Json(listAll.size(), rows, list));
+        return JsonResult.success(JsonUtils.list2Json(count, rows, list));
     }
 
     @RequestMapping(value = "/search/time/{start}/{end}/{page}/{rows}", method = RequestMethod.GET)
@@ -162,11 +158,9 @@ public class YaraController {
         List<YaraBean> list = new ArrayList<>();
         listIt.forEach(list::add);
 
-        //TODO 获取数据总数
-        Iterable<YaraBean> listAllIt = yaraRepository.findAll();
-        List<YaraBean> listAll = Lists.newArrayList(listAllIt);
+        long count = yaraRepository.count();
 
-        return JsonResult.success(JsonUtils.list2Json(listAll.size(), rows, list));
+        return JsonResult.success(JsonUtils.list2Json(count, rows, list));
     }
 
 
