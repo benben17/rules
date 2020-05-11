@@ -49,6 +49,8 @@ public class IocBean implements Serializable {
     private ArrayList<String> threat_actor;
     @JsonProperty("update_time")
     private String update_time;
+//    @JsonProperty("from")
+//    private  String from;
     @JsonProperty("description")
     private String description;
     @JsonProperty("extend")
