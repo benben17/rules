@@ -20,5 +20,8 @@ public class Properties {
     public String getYaraDeleteValidateUrl() {
         return "http://" + yaraUrl + ":" + yaraPort + "/yara/delete";
     }
-    
+
+    public String getYaraFilePath() {
+        return  "./rules";
+    }
 }
