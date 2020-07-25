@@ -1,7 +1,6 @@
 package com.spacex.rule.bean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -76,7 +75,7 @@ public class IocBean implements Serializable {
     @JsonProperty("malicious_type")
     private String malicious_type;
 
-    public static IocBean parseJson(String json) {
+    public static IocBean parseJson(String json){
         IocBean source = null;
         try {
             ObjectMapper mapper = new ObjectMapper();

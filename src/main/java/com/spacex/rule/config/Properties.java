@@ -17,10 +17,8 @@ public class Properties {
     public String getYaraValidateUrl() {
         return "http://" + yaraUrl + ":" + yaraPort + "/yara/verification";
     }
-
-
     public String getYaraDeleteValidateUrl() {
         return "http://" + yaraUrl + ":" + yaraPort + "/yara/delete";
     }
-
+    
 }

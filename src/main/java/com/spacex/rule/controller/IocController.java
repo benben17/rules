@@ -61,7 +61,7 @@ public class IocController {
         if (page < 1 || rows < 1) {
             return JsonResult.fail(ErrorCodeEnum.PARAM_ERROR);
         }
-        Pageable pageable = PageRequest.of(page - 1, rows);
+        Pageable pageable = PageRequest.of(page - 1, rows, new Sort(Sort.Direction.DESC, "create_time.keyword"));
         QueryBuilder queryBuilder = QueryBuilders.wildcardQuery("ioc_list", ioc + "*");
         System.out.println(queryBuilder);
         Iterable<IocBean> listIt = iocRepository.search(queryBuilder, pageable);
@@ -125,7 +125,7 @@ public class IocController {
         String startTime = StringUtil.getDateStr(start);
         String endTime = StringUtil.getDateStr(end);
         System.out.println(startTime + "    " + endTime);
-        Pageable pageable = PageRequest.of(page - 1, rows);
+        Pageable pageable = PageRequest.of(page - 1, rows,new Sort(Sort.Direction.DESC, "create_time.keyword"));
 
         QueryBuilder queryBuilder = QueryBuilders.rangeQuery("create_time.keyword")
                 .from(startTime)

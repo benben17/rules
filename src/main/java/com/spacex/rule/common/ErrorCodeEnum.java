@@ -26,7 +26,10 @@ public enum ErrorCodeEnum {
     DELETE_FAIL(4002, "删除失败"),
     DELETE_ERROR(40002, "实体有关系存在存在，或者有子实体"),
     UPDATE_FAIL(4003, "更新失败"),
-    SELECT_FAIL(4004, "查询失败");
+    SELECT_FAIL(4004, "查询失败"),
+
+    DATA_MISMATCHED(100100, "数据格式不匹配");
+
 
 
     private int code;

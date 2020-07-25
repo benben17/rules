@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Nullable;
+import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -166,10 +167,14 @@ public class YaraController {
 
     @RequestMapping(value = "/file/upload", method = RequestMethod.POST)
     public JsonResult upload(@RequestParam MultipartFile file) {
-        String tmpFileName = "/tmp/" + file.getOriginalFilename();
+        String tmpFileName = properties.getYaraFilePath()+"/tmp/" + file.getOriginalFilename();
 
         try {
             File tmpFile = new File(tmpFileName);
+            if (!tmpFile.exists()) {
+                tmpFile.mkdirs();
+                tmpFile.createNewFile();
+            }
             file.transferTo(tmpFile);
             String fileContent = FileUtils.fileToString(tmpFileName);
             if (fileContent.isEmpty()) {
@@ -180,7 +185,7 @@ public class YaraController {
 
         } catch (IOException ex) {
             log.error("upload file failed!", ex);
-            return JsonResult.fail(ErrorCodeEnum.SYSTEM_ERROR);
+            return JsonResult.fail(ErrorCodeEnum.TRANS_ERROR);
         }
     }
 
@@ -325,4 +330,9 @@ public class YaraController {
         return JsonResult.success(JsonUtils.list2Json(resultList.size(), resultList));
     }
 
+
+//    public static void main(String[] args) {
+//        YaraController controller = new YaraController();
+//        controller.saveData()
+//    }
 }
