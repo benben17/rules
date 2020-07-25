@@ -167,7 +167,12 @@ public class YaraController {
 
     @RequestMapping(value = "/file/upload", method = RequestMethod.POST)
     public JsonResult upload(@RequestParam MultipartFile file) {
-        String tmpFileName = properties.getYaraFilePath()+"/tmp/" + file.getOriginalFilename();
+        String tmpfilePath = properties.getYaraFilePath()+"/tmp/";
+        File filePath = new File(tmpfilePath);
+        if (!filePath.exists()) {
+            filePath.mkdirs();
+        }
+        String tmpFileName = tmpfilePath + file.getOriginalFilename();
         System.out.println(tmpFileName);
 
         try {

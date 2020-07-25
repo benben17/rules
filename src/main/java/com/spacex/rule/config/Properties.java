@@ -21,7 +21,10 @@ public class Properties {
         return "http://" + yaraUrl + ":" + yaraPort + "/yara/delete";
     }
 
+    @Value("${yara.server.yaraFilePath}")
+    public String yaraFilePath;
     public String getYaraFilePath() {
-        return  "./rules";
+        return yaraFilePath;
     }
+
 }
